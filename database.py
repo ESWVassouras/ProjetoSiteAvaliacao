@@ -111,7 +111,8 @@ class DatabaseManager:
             
             # Criar/Atualizar usuário professor padrão
             import bcrypt
-            password = "01230123"
+            # Senha padrão para o professor (deve ser alterada em produção)
+            password = os.getenv('PROFESSOR_PASSWORD', 'professor123')
             password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             
             if self.use_neon:
@@ -166,7 +167,8 @@ class DatabaseManager:
                 cursor.execute('DELETE FROM professores WHERE username = ?', ('professor',))
             
             # Criar novo usuário
-            password = "01230123"
+            # Senha padrão para o professor (deve ser alterada em produção)
+            password = os.getenv('PROFESSOR_PASSWORD', 'professor123')
             password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             
             if self.use_neon:

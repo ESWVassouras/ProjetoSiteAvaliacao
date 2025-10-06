@@ -5,14 +5,15 @@ Configurações do banco de dados
 import os
 
 # Configurações do NeonSQL (PostgreSQL)
+# As credenciais devem ser configuradas via variáveis de ambiente
 NEON_CONFIG = {
-    'host': 'ep-fancy-darkness-acgn9qcf-pooler.sa-east-1.aws.neon.tech',
-    'port': 5432,
-    'database': 'neondb',
-    'user': 'neondb_owner',
-    'password': 'npg_lROacu8Iib4U',
-    'sslmode': 'require',
-    'channel_binding': 'require'
+    'host': os.getenv('NEON_HOST', 'localhost'),
+    'port': int(os.getenv('NEON_PORT', 5432)),
+    'database': os.getenv('NEON_DATABASE', 'neondb'),
+    'user': os.getenv('NEON_USER', 'neondb_owner'),
+    'password': os.getenv('NEON_PASSWORD', ''),
+    'sslmode': os.getenv('NEON_SSLMODE', 'require'),
+    'channel_binding': os.getenv('NEON_CHANNEL_BINDING', 'require')
 }
 
 # String de conexão completa

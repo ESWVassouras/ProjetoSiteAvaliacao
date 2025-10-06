@@ -1,3 +1,19 @@
+"""
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║  🎓 SISTEMA DE AVALIAÇÃO ENTRE EQUIPES                                      ║
+║  📚 Práticas Extensionistas V - Engenharia de Software                      ║
+║                                                                              ║
+║  👨‍🏫 Desenvolvido por: Tiago Castro                                           ║
+║  🏛️  Universidade Vassouras - Campus Maricá                                  ║
+║  📧 tiago.castro@univassouras.edu.br                                        ║
+║                                                                              ║
+║  📅 Copyright © 2025 Tiago Castro. Todos os direitos reservados.            ║
+║  🚀 Versão: 1.0.5 | Python 3.x | Streamlit Framework                       ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+"""
+
 import streamlit as st
 from auth import login_professor, verificar_acesso_professor
 from student_form import main_student_form
@@ -208,7 +224,8 @@ def main():
         <p style="margin: 0;">
             📚 Sistema desenvolvido para Práticas Extensionistas V<br>
             🎓 Curso de Engenharia de Software<br>
-            🔒 Todos os dados são tratados com confidencialidade
+            🔒 Todos os dados são tratados com confidencialidade <br>
+            Copyright © 2025 Tiago Castro. Todos os direitos reservados. 
         </p>
     </div>
     """, unsafe_allow_html=True)

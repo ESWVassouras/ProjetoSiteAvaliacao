@@ -1,0 +1,55 @@
+========================================
+   SISTEMA DE AVALIAÇÃO ENTRE EQUIPES
+   © 2025 Tiago Castro - UNIVASSOURAS
+========================================
+
+🚀 INÍCIO RÁPIDO (Windows):
+   1. Execute: start_sistema.bat
+   2. Aguarde abrir no navegador
+   3. Pronto!
+
+📋 INSTRUÇÕES DETALHADAS:
+
+1. INSTALAÇÃO:
+   - pip install -r requirements.txt
+
+2. EXECUÇÃO:
+   Windows:
+   - start_sistema.bat (automático)
+   - setup_env.bat + streamlit run app.py (manual)
+   
+   Linux/Mac:
+   - Configure variáveis de ambiente
+   - streamlit run app.py
+
+3. ACESSO:
+   - URL: http://localhost:8501
+   - Login: professor
+   - Senha: 01230123
+
+4. FUNCIONALIDADES:
+   - Formulário de avaliação para alunos
+   - Dashboard completo para professor
+   - Filtro por aluno individual
+   - Gráficos e estatísticas
+   - Exportação para Excel
+   - Gerenciamento de dados
+
+5. ARQUIVOS PRINCIPAIS:
+   - app.py - Aplicação principal
+   - student_form.py - Formulário do aluno
+   - admin_dashboard.py - Dashboard do professor
+   - database.py - Gerenciamento do banco
+   - config.py - Configurações
+   - auth.py - Autenticação
+
+6. SOLUÇÃO DE PROBLEMAS:
+   - Erro de conexão: Execute setup_env.bat
+   - Módulo não encontrado: pip install -r requirements.txt
+   - Porta ocupada: Altere porta no Streamlit
+
+========================================
+📧 tiago.castro@univassouras.edu.br
+📚 Práticas Extensionistas V - Eng. Software
+© 2025 Tiago Castro - Todos os direitos reservados
+========================================
