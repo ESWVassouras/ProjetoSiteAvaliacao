@@ -1,30 +1,26 @@
-import sqlite3
 import psycopg2
 import psycopg2.extras
 import os
 from datetime import datetime
-from config import USE_NEON_DB, NEON_CONFIG, NEON_CONNECTION_STRING, SQLITE_CONFIG
+from config import USE_NEON_DB, NEON_CONFIG, NEON_CONNECTION_STRING
 
 class DatabaseManager:
     def __init__(self, db_path=None):
-        self.use_neon = USE_NEON_DB
-        self.db_path = db_path or SQLITE_CONFIG['db_path']
+        # Usar sempre NeonSQL (PostgreSQL)
+        print("✅ Conectando ao banco NeonSQL (PostgreSQL)")
         self.connection = None
         self.init_database()
     
     def get_connection(self):
-        """Obtém conexão com o banco de dados"""
-        if self.use_neon:
-            return psycopg2.connect(
-                host=NEON_CONFIG['host'],
-                port=NEON_CONFIG['port'],
-                database=NEON_CONFIG['database'],
-                user=NEON_CONFIG['user'],
-                password=NEON_CONFIG['password'],
-                sslmode=NEON_CONFIG['sslmode']
-            )
-        else:
-            return sqlite3.connect(self.db_path)
+        """Obtém conexão com o banco de dados NeonSQL"""
+        return psycopg2.connect(
+            host=NEON_CONFIG['host'],
+            port=NEON_CONFIG['port'],
+            database=NEON_CONFIG['database'],
+            user=NEON_CONFIG['user'],
+            password=NEON_CONFIG['password'],
+            sslmode=NEON_CONFIG['sslmode']
+        )
     
     def init_database(self):
         """Inicializa o banco de dados com as tabelas necessárias"""
@@ -32,116 +28,62 @@ class DatabaseManager:
             conn = self.get_connection()
             cursor = conn.cursor()
             
-            if self.use_neon:
-                # PostgreSQL - Tabela de professores
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS professores (
-                        id SERIAL PRIMARY KEY,
-                        username VARCHAR(255) UNIQUE NOT NULL,
-                        password_hash TEXT NOT NULL,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                ''')
-                
-                # PostgreSQL - Tabela de equipes
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS equipes (
-                        id SERIAL PRIMARY KEY,
-                        nome_equipe VARCHAR(255) NOT NULL,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                ''')
-                
-                # PostgreSQL - Tabela de avaliações
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS avaliacoes (
-                        id SERIAL PRIMARY KEY,
-                        avaliador_nome VARCHAR(255) NOT NULL,
-                        avaliador_matricula VARCHAR(255) NOT NULL,
-                        nome_equipe VARCHAR(255) NOT NULL,
-                        avaliado_nome VARCHAR(255) NOT NULL,
-                        pontuacao INTEGER NOT NULL CHECK (pontuacao >= 0 AND pontuacao <= 2),
-                        comprometimento BOOLEAN DEFAULT FALSE,
-                        trabalho_equipe BOOLEAN DEFAULT FALSE,
-                        qualidade_entregas BOOLEAN DEFAULT FALSE,
-                        proatividade BOOLEAN DEFAULT FALSE,
-                        cumprimento_responsabilidades BOOLEAN DEFAULT FALSE,
-                        comentario TEXT,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                ''')
-            else:
-                # SQLite - Tabela de professores
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS professores (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        username TEXT UNIQUE NOT NULL,
-                        password_hash TEXT NOT NULL,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                ''')
-                
-                # SQLite - Tabela de equipes
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS equipes (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        nome_equipe TEXT NOT NULL,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                ''')
-                
-                # SQLite - Tabela de avaliações
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS avaliacoes (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        avaliador_nome TEXT NOT NULL,
-                        avaliador_matricula TEXT NOT NULL,
-                        nome_equipe TEXT NOT NULL,
-                        avaliado_nome TEXT NOT NULL,
-                        pontuacao INTEGER NOT NULL CHECK (pontuacao >= 0 AND pontuacao <= 2),
-                        comprometimento BOOLEAN DEFAULT 0,
-                        trabalho_equipe BOOLEAN DEFAULT 0,
-                        qualidade_entregas BOOLEAN DEFAULT 0,
-                        proatividade BOOLEAN DEFAULT 0,
-                        cumprimento_responsabilidades BOOLEAN DEFAULT 0,
-                        comentario TEXT,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                ''')
+            # PostgreSQL - Tabela de professores
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS professores (
+                    id SERIAL PRIMARY KEY,
+                    username VARCHAR(255) UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
             
-            # Criar/Atualizar usuário professor padrão
-            import bcrypt
-            # Senha padrão para o professor (deve ser alterada em produção)
-            password = os.getenv('PROFESSOR_PASSWORD', 'professor123')
-            password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            # PostgreSQL - Tabela de equipes
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS equipes (
+                    id SERIAL PRIMARY KEY,
+                    nome_equipe VARCHAR(255) NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
             
-            if self.use_neon:
-                cursor.execute('SELECT COUNT(*) FROM professores WHERE username = %s', ('professor',))
-                count = cursor.fetchone()[0]
-                if count == 0:
-                    cursor.execute('''
-                        INSERT INTO professores (username, password_hash) 
-                        VALUES (%s, %s)
-                    ''', ('professor', password_hash))
-                else:
-                    cursor.execute('''
-                        UPDATE professores 
-                        SET password_hash = %s 
-                        WHERE username = %s
-                    ''', (password_hash, 'professor'))
-            else:
-                cursor.execute('SELECT COUNT(*) FROM professores WHERE username = ?', ('professor',))
-                if cursor.fetchone()[0] == 0:
-                    cursor.execute('''
-                        INSERT INTO professores (username, password_hash) 
-                        VALUES (?, ?)
-                    ''', ('professor', password_hash))
-                else:
-                    cursor.execute('''
-                        UPDATE professores 
-                        SET password_hash = ? 
-                        WHERE username = ?
-                    ''', (password_hash, 'professor'))
+            # PostgreSQL - Tabela de avaliações
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS avaliacoes (
+                    id SERIAL PRIMARY KEY,
+                    avaliador_nome VARCHAR(255) NOT NULL,
+                    avaliador_matricula VARCHAR(255) NOT NULL,
+                    nome_equipe VARCHAR(255) NOT NULL,
+                    avaliado_nome VARCHAR(255) NOT NULL,
+                    pontuacao INTEGER NOT NULL CHECK (pontuacao >= 0 AND pontuacao <= 2),
+                    comprometimento BOOLEAN DEFAULT FALSE,
+                    trabalho_equipe BOOLEAN DEFAULT FALSE,
+                    qualidade_entregas BOOLEAN DEFAULT FALSE,
+                    proatividade BOOLEAN DEFAULT FALSE,
+                    cumprimento_responsabilidades BOOLEAN DEFAULT FALSE,
+                    comentario TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            # Verificar se existe pelo menos um professor cadastrado
+            cursor.execute('SELECT COUNT(*) FROM professores')
+            count = cursor.fetchone()[0]
+            
+            # Se não houver nenhum professor, criar um com senha padrão
+            if count == 0:
+                import bcrypt
+                # Senha padrão para o primeiro professor (deve ser alterada após o primeiro login)
+                default_password = 'professor123'
+                password_hash = bcrypt.hashpw(default_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                
+                cursor.execute('''
+                    INSERT INTO professores (username, password_hash) 
+                    VALUES (%s, %s)
+                ''', ('professor', password_hash))
+                
+                print("⚠️  ATENÇÃO: Usuário professor criado com senha padrão 'professor123'")
+                print("⚠️  ALTERE A SENHA APÓS O PRIMEIRO LOGIN POR SEGURANÇA!")
             
             conn.commit()
             conn.close()
@@ -153,40 +95,36 @@ class DatabaseManager:
             print(f"Erro ao inicializar banco de dados: {e}")
             raise
     
-    def recriar_usuario_professor(self):
-        """Recria o usuário professor com senha correta"""
+    def alterar_senha_professor(self, username, nova_senha):
+        """Altera a senha de um professor"""
         import bcrypt
         conn = self.get_connection()
         cursor = conn.cursor()
         
         try:
-            # Deletar usuário existente
-            if self.use_neon:
-                cursor.execute('DELETE FROM professores WHERE username = %s', ('professor',))
-            else:
-                cursor.execute('DELETE FROM professores WHERE username = ?', ('professor',))
+            # Gerar hash da nova senha
+            password_hash = bcrypt.hashpw(nova_senha.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             
-            # Criar novo usuário
-            # Senha padrão para o professor (deve ser alterada em produção)
-            password = os.getenv('PROFESSOR_PASSWORD', 'professor123')
-            password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-            
+            # Atualizar senha no banco
             if self.use_neon:
                 cursor.execute('''
-                    INSERT INTO professores (username, password_hash) 
-                    VALUES (%s, %s)
-                ''', ('professor', password_hash))
+                    UPDATE professores 
+                    SET password_hash = %s 
+                    WHERE username = %s
+                ''', (password_hash, username))
             else:
                 cursor.execute('''
-                    INSERT INTO professores (username, password_hash) 
-                    VALUES (?, ?)
-                ''', ('professor', password_hash))
+                    UPDATE professores 
+                    SET password_hash = ? 
+                    WHERE username = ?
+                ''', (password_hash, username))
             
             conn.commit()
-            print("Usuário professor recriado com sucesso!")
+            print(f"Senha do professor '{username}' alterada com sucesso!")
+            return True
         except Exception as e:
-            print(f"Erro ao recriar usuário: {e}")
-            raise
+            print(f"Erro ao alterar senha: {e}")
+            return False
         finally:
             conn.close()
     
@@ -197,10 +135,7 @@ class DatabaseManager:
         cursor = conn.cursor()
         
         try:
-            if self.use_neon:
-                cursor.execute('SELECT password_hash FROM professores WHERE username = %s', (username,))
-            else:
-                cursor.execute('SELECT password_hash FROM professores WHERE username = ?', (username,))
+            cursor.execute('SELECT password_hash FROM professores WHERE username = %s', (username,))
             
             result = cursor.fetchone()
             
@@ -230,53 +165,29 @@ class DatabaseManager:
         cursor = conn.cursor()
         
         try:
-            if self.use_neon:
-                cursor.execute('''
-                    INSERT INTO avaliacoes (
-                        avaliador_nome, avaliador_matricula, nome_equipe, avaliado_nome,
-                        pontuacao, comprometimento, trabalho_equipe, qualidade_entregas,
-                        proatividade, cumprimento_responsabilidades, comentario
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    RETURNING id
-                ''', (
-                    dados_avaliacao['avaliador_nome'],
-                    dados_avaliacao['avaliador_matricula'],
-                    dados_avaliacao['nome_equipe'],
-                    dados_avaliacao['avaliado_nome'],
-                    dados_avaliacao['pontuacao'],
-                    dados_avaliacao['comprometimento'],
-                    dados_avaliacao['trabalho_equipe'],
-                    dados_avaliacao['qualidade_entregas'],
-                    dados_avaliacao['proatividade'],
-                    dados_avaliacao['cumprimento_responsabilidades'],
-                    dados_avaliacao.get('comentario', '')
-                ))
-                result = cursor.fetchone()
-                conn.commit()
-                return result[0] if result else None
-            else:
-                cursor.execute('''
-                    INSERT INTO avaliacoes (
-                        avaliador_nome, avaliador_matricula, nome_equipe, avaliado_nome,
-                        pontuacao, comprometimento, trabalho_equipe, qualidade_entregas,
-                        proatividade, cumprimento_responsabilidades, comentario
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', (
-                    dados_avaliacao['avaliador_nome'],
-                    dados_avaliacao['avaliador_matricula'],
-                    dados_avaliacao['nome_equipe'],
-                    dados_avaliacao['avaliado_nome'],
-                    dados_avaliacao['pontuacao'],
-                    dados_avaliacao['comprometimento'],
-                    dados_avaliacao['trabalho_equipe'],
-                    dados_avaliacao['qualidade_entregas'],
-                    dados_avaliacao['proatividade'],
-                    dados_avaliacao['cumprimento_responsabilidades'],
-                    dados_avaliacao.get('comentario', '')
-                ))
-                
-                conn.commit()
-                return cursor.lastrowid
+            cursor.execute('''
+                INSERT INTO avaliacoes (
+                    avaliador_nome, avaliador_matricula, nome_equipe, avaliado_nome,
+                    pontuacao, comprometimento, trabalho_equipe, qualidade_entregas,
+                    proatividade, cumprimento_responsabilidades, comentario
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id
+            ''', (
+                dados_avaliacao['avaliador_nome'],
+                dados_avaliacao['avaliador_matricula'],
+                dados_avaliacao['nome_equipe'],
+                dados_avaliacao['avaliado_nome'],
+                dados_avaliacao['pontuacao'],
+                dados_avaliacao['comprometimento'],
+                dados_avaliacao['trabalho_equipe'],
+                dados_avaliacao['qualidade_entregas'],
+                dados_avaliacao['proatividade'],
+                dados_avaliacao['cumprimento_responsabilidades'],
+                dados_avaliacao.get('comentario', '')
+            ))
+            result = cursor.fetchone()
+            conn.commit()
+            return result[0] if result else None
         except Exception as e:
             print(f"Erro ao salvar avaliação: {e}")
             raise
@@ -365,10 +276,7 @@ class DatabaseManager:
         cursor = conn.cursor()
         
         try:
-            if self.use_neon:
-                cursor.execute('DELETE FROM avaliacoes WHERE id = %s', (avaliacao_id,))
-            else:
-                cursor.execute('DELETE FROM avaliacoes WHERE id = ?', (avaliacao_id,))
+            cursor.execute('DELETE FROM avaliacoes WHERE id = %s', (avaliacao_id,))
             
             deleted_count = cursor.rowcount
             conn.commit()
@@ -393,18 +301,11 @@ class DatabaseManager:
             # Inserir cada equipe na tabela equipes se não existir
             for (nome_equipe,) in equipes_avaliacoes:
                 if nome_equipe and nome_equipe.strip():  # Verificar se não é vazio
-                    if self.use_neon:
-                        cursor.execute('SELECT COUNT(*) FROM equipes WHERE nome_equipe = %s', (nome_equipe,))
-                    else:
-                        cursor.execute('SELECT COUNT(*) FROM equipes WHERE nome_equipe = ?', (nome_equipe,))
-                    
+                    cursor.execute('SELECT COUNT(*) FROM equipes WHERE nome_equipe = %s', (nome_equipe,))
                     count = cursor.fetchone()[0]
                     
                     if count == 0:  # Se não existir, inserir
-                        if self.use_neon:
-                            cursor.execute('INSERT INTO equipes (nome_equipe) VALUES (%s)', (nome_equipe,))
-                        else:
-                            cursor.execute('INSERT INTO equipes (nome_equipe) VALUES (?)', (nome_equipe,))
+                        cursor.execute('INSERT INTO equipes (nome_equipe) VALUES (%s)', (nome_equipe,))
             
             conn.commit()
             
@@ -420,25 +321,15 @@ class DatabaseManager:
         
         try:
             # Verificar se a equipe já existe
-            if self.use_neon:
-                cursor.execute('SELECT COUNT(*) FROM equipes WHERE nome_equipe = %s', (nome_equipe,))
-            else:
-                cursor.execute('SELECT COUNT(*) FROM equipes WHERE nome_equipe = ?', (nome_equipe,))
-            
+            cursor.execute('SELECT COUNT(*) FROM equipes WHERE nome_equipe = %s', (nome_equipe,))
             count = cursor.fetchone()[0]
             
             # Se não existir, inserir
             if count == 0:
-                if self.use_neon:
-                    cursor.execute('''
-                        INSERT INTO equipes (nome_equipe) 
-                        VALUES (%s)
-                    ''', (nome_equipe,))
-                else:
-                    cursor.execute('''
-                        INSERT INTO equipes (nome_equipe) 
-                        VALUES (?)
-                    ''', (nome_equipe,))
+                cursor.execute('''
+                    INSERT INTO equipes (nome_equipe) 
+                    VALUES (%s)
+                ''', (nome_equipe,))
                 
                 conn.commit()
             
@@ -515,10 +406,7 @@ class DatabaseManager:
         cursor = conn.cursor()
         
         try:
-            if self.use_neon:
-                cursor.execute('DELETE FROM equipes WHERE nome_equipe = %s', (nome_equipe,))
-            else:
-                cursor.execute('DELETE FROM equipes WHERE nome_equipe = ?', (nome_equipe,))
+            cursor.execute('DELETE FROM equipes WHERE nome_equipe = %s', (nome_equipe,))
             
             deleted_count = cursor.rowcount
             conn.commit()
@@ -547,15 +435,6 @@ class DatabaseManager:
                         SUM(CASE WHEN pontuacao = 0 THEN 1 ELSE 0 END) as pontuacao_0
                     FROM avaliacoes 
                     WHERE avaliado_nome = %s OR avaliado_nome = %s
-                ''' if self.use_neon else '''
-                    SELECT 
-                        COUNT(*) as total_avaliacoes,
-                        AVG(pontuacao) as media_pontuacao,
-                        SUM(CASE WHEN pontuacao = 2 THEN 1 ELSE 0 END) as pontuacao_2,
-                        SUM(CASE WHEN pontuacao = 1 THEN 1 ELSE 0 END) as pontuacao_1,
-                        SUM(CASE WHEN pontuacao = 0 THEN 1 ELSE 0 END) as pontuacao_0
-                    FROM avaliacoes 
-                    WHERE avaliado_nome = ? OR avaliado_nome = ?
                 ''', (nome_aluno, nome_aluno))
                 
                 result = cursor.fetchone()

@@ -29,6 +29,7 @@ Sistema desenvolvido em Python com Streamlit para avaliação anônima entre mem
 ### Pré-requisitos
 - Python 3.8 ou superior
 - pip (gerenciador de pacotes Python)
+- Conta no NeonSQL (para banco de dados)
 
 ### Instalação
 
@@ -39,66 +40,51 @@ Sistema desenvolvido em Python com Streamlit para avaliação anônima entre mem
    pip install -r requirements.txt
    ```
 
-3. **Execute o sistema:**
+3. **Sistema pronto para uso!**
    
-   
-   **Windows (Manual):**
+   **✅ Não é necessário configurar nada!** O sistema já está configurado para usar o banco NeonSQL automaticamente.
+
+4. **Execute o sistema:**
    ```bash
-   streamlit run app.py
-   ```
-   
-   **Linux/Mac:**
-   ```bash
-   # Configure as variáveis de ambiente manualmente
    streamlit run app.py
    ```
 
-4. **Acesse no navegador:**
+5. **Acesse no navegador:**
    - A aplicação será aberta automaticamente em `http://localhost:8501`
 
 ## 🔐 Acesso do Professor
 
-Para acessar o dashboard do professor, use as credenciais configuradas no sistema. 
-(Acesso restrito ao professor)
+**Usuário:** `professor`  
+**Senha:** Gerenciada diretamente no banco de dados NeonSQL
 
+### 📝 Primeiro Acesso:
+- **Usuário:** `professor`
+- **Senha:** `professor123` (senha padrão)
+- **⚠️ IMPORTANTE:** Altere a senha após o primeiro login por segurança!
 
-### Configuração de Variáveis de Ambiente
+### ⚠️ IMPORTANTE - SEGURANÇA
 
-Para maior segurança, configure as seguintes variáveis de ambiente:
+**NUNCA commite credenciais no código!** Este sistema foi desenvolvido com foco em segurança.
 
-#### **Windows (Recomendado):**
-Execute um dos scripts de configuração:
-- **Batch:** `setup_env.bat`
-- **PowerShell:** `setup_env.ps1`
+## 🚀 Deploy
 
-#### **Linux/Mac:**
-```bash
-# Banco de dados NeonSQL
-export NEON_HOST="seu_host_aqui"
-export NEON_PORT="5432"
-export NEON_DATABASE="seu_database_aqui"
-export NEON_USER="seu_usuario_aqui"
-export NEON_PASSWORD="sua_senha_do_banco_aqui"
-export NEON_SSLMODE="require"
-export NEON_CHANNEL_BINDING="require"
+### **Streamlit Cloud:**
+1. **Faça push do código para o GitHub**
+2. **Acesse seu app no Streamlit Cloud**
+3. **Faça o deploy** - o sistema funcionará automaticamente!
 
-# Senha do professor (opcional, padrão: professor123)
-export PROFESSOR_PASSWORD="sua_senha_segura_aqui"
-```
+**✅ Não é necessário configurar nada!** O sistema já está configurado para usar o NeonSQL.
 
-#### **Configuração Manual no Windows:**
-```powershell
-$env:NEON_HOST="seu_host_aqui"
-$env:NEON_PORT="5432"
-$env:NEON_DATABASE="seu_database_aqui"
-$env:NEON_USER="seu_usuario_aqui"
-$env:NEON_PASSWORD="sua_senha_do_banco_aqui"
-$env:NEON_SSLMODE="require"
-$env:NEON_CHANNEL_BINDING="require"
-$env:PROFESSOR_PASSWORD="sua_senha_segura_aqui"
-```
+### **🛡️ Boas Práticas de Segurança:**
 
-**Importante:** As credenciais do banco e senha do professor devem ser alteradas em ambiente de produção.
+- ✅ **Use senhas fortes** (mínimo 12 caracteres)
+- ✅ **Mantenha as credenciais seguras**
+- ✅ **Use variáveis de ambiente**
+- ✅ **Revise as permissões de acesso**
+- ❌ **NUNCA commite o arquivo .env**
+- ❌ **NUNCA compartilhe credenciais**
+- ❌ **NUNCA use senhas fracas**
+- ❌ **NUNCA deixe credenciais no código**
 
 ## 📋 Critérios de Avaliação
 
@@ -118,7 +104,13 @@ Os alunos podem avaliar seus colegas baseados nos seguintes critérios:
 
 ## 🗄️ Banco de Dados
 
-O sistema utiliza **SQLite3** para armazenamento local, mas está preparado para migração para **NeonSQL** (PostgreSQL).
+O sistema utiliza **NeonSQL (PostgreSQL)** como banco de dados principal.
+
+### **🔧 Configuração:**
+- ✅ **Credenciais configuradas diretamente** no código
+- ✅ **Conexão automática** com o banco NeonSQL
+- ✅ **Funciona imediatamente** sem configuração adicional
+- ✅ **Dados persistem** entre sessões e deploys
 
 ### Estrutura das Tabelas
 
